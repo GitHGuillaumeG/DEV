@@ -1,2 +1,2 @@
 # DEV
-Main maya pipeline develoment repo
+Maya develoment repo
