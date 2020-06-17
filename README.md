@@ -1,2 +1,2 @@
 # DEV
-Maya develoment repo
+Maya development repo
