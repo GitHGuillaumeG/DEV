@@ -9,10 +9,10 @@ from .base import Base
 from ..rigobject.control import Control
 
 
-class FkTest(Base):
+class Fk(Base):
 
     def __init__(self, module_name, objects):
-        super(FkTest, self).__init__(module_name)
+        super(Fk, self).__init__(module_name)
 
         # input attributes
         if isinstance(objects, str):
@@ -35,7 +35,7 @@ class FkTest(Base):
          
         :return: 
         """
-        super(FkTest, self).start()
+        super(Fk, self).start()
 
         for object_name in self.objects:
             guide_object = cmds.spaceLocator(name='{0}_GUIDE'.format(object_name))
@@ -66,9 +66,9 @@ class FkTest(Base):
             ctl.add_joint()
 
 
-def run(name, guides_name):
+def run(name, objects):
 
-    fk_mod = FkTest(name, guides_name)
+    fk_mod = Fk(name, objects)
 
     # Creates guides and retrieves matrix and parent information from the stored module data (if data exists)
     fk_mod.start()
