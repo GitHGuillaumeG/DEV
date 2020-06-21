@@ -8,8 +8,8 @@ import maya.cmds as cmds
 from maya.api import OpenMaya as om
 
 # Cortex
-from ..cortexcore import component
-from ..cortexcore import environment
+from ..api import component
+from ..api import environment
 
 
 class Control(object):
@@ -42,7 +42,7 @@ class Control(object):
             self._shape = value
         else:
             self._shape = DEFAULT_SHAPE
-        self.set_shape()
+        self.set_shape_data()
 
     def add_buffer(self):
 
@@ -148,7 +148,7 @@ class Control(object):
 
         """
 
-        shape_library = environment.CONTROLSHAPE_LIBRARY
+        shape_library = environment.Environment.controlShape_library
         shape_file = os.path.join(shape_library, '{0}.json'.format(value))
 
         if not os.path.isfile(shape_file):
