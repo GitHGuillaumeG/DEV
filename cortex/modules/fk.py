@@ -22,39 +22,39 @@ class Fk(Base):
         else:
             self.objects = ('fk_0', )
 
-        # stored attributes
-        self.guides_data = self.deserialize(self.name, 'guides') if not None else dict()
-
         # output attributes
-        self.guides = None
-        self.output = None
+        self.guides = list()
 
     def start(self):
         """
-        Creates the guides locators for the module. Retrieves matrix and parent from stored data.
-         
-        :return: 
+        Creates the guides locators for the module. Retrieves matrix and hierarchy from stored data.
+        
         """
+
         super(Fk, self).start()
 
         for object_name in self.objects:
-            guide_object = cmds.spaceLocator(name='{0}_GUIDE'.format(object_name))
+            guide_object = cmds.spaceLocator(name='{0}_GUIDE'.format(object_name))[0]
             self.guides.append(guide_object)
 
             # Retrieve guide's position from stored data
-            if object_name in self.guides_data.keys():
-                cmds.xform(guide_object, worldSpace=True, matrix=self.guides_data[object_name]['matrix'])
+            if guide_object in self.start_data.keys():
+                cmds.xform(guide_object, worldSpace=True, matrix=self.start_data[guide_object]['matrix'])
 
         # Retrieve guide's parent from stored data
-        for object_name in self.objects:
-            if object_name in self.guides_data.keys():
-                cmds.parent('{0}_GUIDE'.format(object_name), self.guides_data[object_name]['parent'])
+        for guide_object in self.guides:
+            if guide_object in self.start_data.keys():
+                parent = self.start_data[guide_object]['hierarchy']
+                if not parent == 'world':
+                    cmds.parent(guide_object, parent)
 
     def build(self):
         """
         
         :return: 
         """
+        super(Fk, self).build()
+
         if not self.guides:
             print('no start objects found,  abort.')
             return
@@ -64,6 +64,9 @@ class Fk(Base):
             ctl.set_shape_from_library('square')
             ctl.add_buffer()
             ctl.add_joint()
+
+    def connect(self):
+        super(Fk, self).connect()
 
 
 def run(name, objects):

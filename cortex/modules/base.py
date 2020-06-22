@@ -54,47 +54,55 @@ class Base(object):
         # input attributes
         self.name = name
 
-        # output attributes
+        # stored module_step attributes
         self.start_data = dict()
         self.build_data = dict()
         self.connect_data = dict()
 
     def start(self):
-        pass
+
+        data = self.deserialize(self.name, step='start')
+        if data:
+            self.start_data = data
 
     def build(self):
-        pass
+
+        self.build_data = self.deserialize(self.name, step='build') if not None else dict()
 
     def connect(self):
-        pass
 
-    def serialize(self, module_step=None, data=None):
+        self.connect_data = self.deserialize(self.name, step='connect') if not None else dict()
+
+    def serialize(self, module_attribute=None, module_step=None, data=None):
         """
-        Saves/Writes a module's data on disk.
-
-        module_step should be set to start, build or connect. 
-
-        :param module_step: (str) the module step (start, build, connect) 
+        Saves/Writes a module's module_step data on disk.
+        
+        :param module_attribute: (str) name of a module attribute to serialize
+        :param module_step: (str) either start, build or connect 
         :param data: (dict) the data to write on disk
 
-        :return: (str, dict) module step, data
+        :return: (str, str, dict) module_attribute, module_step, data
         """
 
-        if not module_step or not data:
+        if not module_attribute or not module_step or not data:
             return None
 
         data = json.dumps(data, indent=2)
 
-        module_path = os.path.join(environment.Environment.data_path, self.name)
-        if not os.path.isdir(module_path):
-            os.mkdir(module_path)
+        module_data_path = os.path.join(environment.Environment.data_path, self.name)
+        if not os.path.isdir(module_data_path):
+            os.mkdir(module_data_path)
 
-        module_step = os.path.join(module_path, '{0}.json'.format(module_step))
+        module_step = os.path.join(module_data_path, module_step)
+        if not os.path.isdir(module_data_path):
+            os.mkdir(module_data_path)
 
-        with open(module_step, 'w+') as handle:
+        module_attribute_file = os.path.join(module_step, '{0}.json'.format(module_attribute))
+
+        with open(module_attribute_file, 'w+') as handle:
             handle.write(data)
 
-        return module_step, data
+        return module_step, module_attribute, data
 
     def serialize_start_data(self, guides):
         """
@@ -113,12 +121,17 @@ class Base(object):
                         ...
                         }
         """
-
         for guide in guides:
-            mat = cmds.xform(guide, q=True, worldSpqce=True, matrix=True)
-            parent = cmds.listRelatives(guide, parent=True)[0]
+            self.start_data[guide] = dict(matrix=list(), hierarchy='')
+
+            mat = cmds.xform(guide, q=True, worldSpace=True, matrix=True)
             self.start_data[guide]['matrix'] = mat
-            self.start_data[guide]['hierarchy'] = parent
+
+            parent = cmds.listRelatives(guide, parent=True)
+            if parent:
+                self.start_data[str(guide)]['hierarchy'] = parent[0]
+            else:
+                self.start_data[str(guide)]['hierarchy'] = 'world'
 
         self.serialize(module_step='start', data=self.start_data)
 
@@ -130,29 +143,34 @@ class Base(object):
     def serialize_connect_data(self):
         pass
 
-    def deserialize(self, module_name, attribute=None):
+    def deserialize(self, module_name, step=None):
         """
         Returns the data from a module_name and a module attribute.
         
         :param module_name: (str) name of a module 
-        :param attribute: (str) name of a module attribute  
+        :param step: (str) name of a module step
         
         :return: 
         """
-        if not attribute:
+        print(module_name, step)
+        if not step:
             return None
 
+        print 'been here'
         data_path = environment.Environment.data_path
         print (data_path, type(data_path))
         module_path = os.path.join(data_path, module_name)
         if not os.path.isdir(module_path):
             return None
 
-        attribute_path = os.path.join(module_path, '{0}.json'.format(attribute))
-        if not os.path.isfile(attribute_path):
+        print 'been there'
+        step_path = os.path.join(module_path, '{0}.json'.format(step))
+        if not os.path.isfile(step_path):
             return None
 
-        return json.load(attribute_path)
+        print 'all the way'
+        with open(step_path, 'r') as handle:
+            return json.load(handle)
 
 
 
