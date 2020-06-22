@@ -16,8 +16,8 @@ class Environment(object):
 
     current = None
     data_path = None
-    cortex = None
-    controlShape_library = None
+    cortex_path = None
+    controlShape_library_path = None
 
     def __init__(self):
 
@@ -35,18 +35,22 @@ class Environment(object):
         :return: (str) the path of the environment 
         """
 
-        # Asset/shot
-        environment = os.path.normpath(os.path.join('E:/PROD', show, division, asset_type, asset_name))
+        # Current Asset environment
+        environment = os.path.join('E:/PROD', show, division, asset_type, asset_name).replace(os.sep, '/')
         if not os.path.isdir(environment):
             print 'falied to set environment'
 
         Environment.current = environment
-        Environment.data_path = os.path.normpath(os.path.join(environment, 'rig/DATA'))
+
+        # Data path
+        data_path = os.path.join(environment, 'rig/DATA')
+        Environment.data_path = os.path.normpath(data_path)
 
         # Cortex
-        Environment.cortex = os.path.normpath('E:/DEV/cortex')
-        Environment.controlShape_library = os.path.normpath(os.path.join(Environment.cortex,
-                                                                         'cortexlibrary/controlshapes'))
+        Environment.cortex_path = os.path.normpath('E:/DEV/cortex')
+
+        control_shape_library = os.path.join(Environment.cortex_path, 'cortexlibrary/controlshapes')
+        Environment.controlShape_library_path = os.path.normpath(control_shape_library)
 
     def set_shot(self):
         pass
