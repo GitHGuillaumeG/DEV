@@ -1,6 +1,11 @@
 # Python libs
 import os
 
+PROD = 'D:/CG/PROJECTS'
+CORTEX = 'D:/CG/DEV/cortex'
+CONTROLSHAPES_LIBRARY = 'D:/CG/DEV/cortex/library/controlshapes'
+CONTROLSHAPES_COLOR = 'D:/CG/DEV/cortex/library/colors/controlshapes.json'
+
 
 class Environment(object):
     """
@@ -17,10 +22,8 @@ class Environment(object):
     current = None
     data_path = None
     cortex_path = None
-    controlShape_library_path = None
 
     def __init__(self):
-
         pass
 
     def set_asset(self, show, division, asset_type, asset_name):
@@ -36,21 +39,15 @@ class Environment(object):
         """
 
         # Current Asset environment
-        environment = os.path.join('E:/PROD', show, division, asset_type, asset_name).replace(os.sep, '/')
+        environment = os.path.join(PROD, show, division, asset_type, asset_name).replace(os.sep, '/')
         if not os.path.isdir(environment):
-            print 'falied to set environment'
+            print('failed to set environment')
 
         Environment.current = environment
 
         # Data path
         data_path = os.path.join(environment, 'rig/DATA')
         Environment.data_path = os.path.normpath(data_path)
-
-        # Cortex
-        Environment.cortex_path = os.path.normpath('E:/DEV/cortex')
-
-        control_shape_library = os.path.join(Environment.cortex_path, 'cortexlibrary/controlshapes')
-        Environment.controlShape_library_path = os.path.normpath(control_shape_library)
 
     def set_shot(self):
         pass
