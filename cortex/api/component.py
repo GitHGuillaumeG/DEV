@@ -15,10 +15,14 @@ def get_cv_positions_from_curve(curve, space='world'):
 
     curve_object = om.MGlobal.getSelectionListByName(curve).getDagPath(0)
     curve_fn = om.MFnNurbsCurve(curve_object)
+    num_cvs = curve_fn.numCVs
+    data = dict()
 
-    if not space == 'world':
-        positions = curve_fn.cvPositions(space=om.MSpace.kObject)
-    else:
-        positions = curve_fn.cvPositions(space=om.MSpace.kWorld)
+    for cv_index in range(num_cvs):
+        if not space == 'world':
+            position = curve_fn.cvPosition(cv_index)
+        else:
+            position = curve_fn.cvPosition(cv_index, space=om.MSpace.kWorld)
+        data[cv_index] = position[0], position[1], position[2]
 
-    return positions
+    return data
